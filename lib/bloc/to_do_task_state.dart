@@ -1,15 +1,16 @@
 part of 'to_do_task_bloc.dart';
 
-class ToDoTaskState extends Equatable {
-  ToDoTaskState({TaskData? data, this.taskState = ToDoTaskEvent.todo}) : _data = data ?? const TaskData();
+abstract class ToDoTaskState extends Equatable {
+  const ToDoTaskState({TaskData? data}) : _data = data ?? const TaskData();
 
   final TaskData _data;
-  ToDoTaskEvent taskState;
+  TaskData get getData => _data;
 
-  ToDoTaskState newState(ToDoTaskEvent newState) {
-    return ToDoTaskState(data: _data, taskState: newState);
-  }
+  //ToDoTaskState newState(ToDoTaskEvent event);
 
   @override
-  List<Object> get props => [_data,taskState];
+  List<Object> get props => [_data];
 }
+
+class ActiveTaskState extends ToDoTaskState {}
+class CompetedTaskState extends ToDoTaskState {}

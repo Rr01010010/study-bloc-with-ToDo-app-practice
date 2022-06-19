@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: BlocProvider(
-          create: (_) => ToDoTaskBloc(),
+          create: (_) => TaskBloc(),
           child: const MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
@@ -48,6 +48,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   void _incrementCounter() {
     setState(() {
+      //BlocProvider.of<TaskBloc>().
       //_counter++;
     });
   }
@@ -58,14 +59,14 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: BlocBuilder<ToDoTaskBloc, ToDoTaskState>(
+      body: BlocBuilder<TaskBloc, ToDoTaskState>(
         builder: (context, state) {
           return Center(
             child: Column(
               children: <Widget>[
-                todoWidget(),
-                todoWidget(),
-                todoWidget(),
+                todoWidget(state),
+                //todoWidget(),
+                //todoWidget(),
               ],
             ),
           );
@@ -79,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget todoWidget(TaskData task) {
+  Widget todoWidget(ToDoTaskState task) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: Row(
@@ -88,15 +89,23 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Align(
                 alignment: Alignment.centerLeft,
-                child: Checkbox(value: true, onChanged: (val) {})),
+                child: Checkbox(
+                    value: task is CompetedTaskState,
+                    onChanged: (val) {
+                      BlocProvider.of<TaskBloc>(context).add(
+                          task is CompetedTaskState
+                              ? TaskEvent.active
+                              : TaskEvent.completed);
+                    })),
             const SizedBox(width: 8),
             Align(
               alignment: Alignment.center,
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(task.title, style: const TextStyle(fontSize: 20)),
-                    Text(task.description,
+                    Text(task.getData.title,
+                        style: const TextStyle(fontSize: 20)),
+                    Text(task.getData.description,
                         style: const TextStyle(fontSize: 12)),
                   ]),
             ),

@@ -5,14 +5,14 @@ import 'package:todo/task_data.dart';
 part 'to_do_task_event.dart';
 part 'to_do_task_state.dart';
 
-class ToDoTaskBloc extends Bloc<ToDoTaskEvent, ToDoTaskState> {
-  ToDoTaskBloc() : super(ToDoTaskState()) {
-    on<ToDoTaskEvent>((event, emit) {
+class TaskBloc extends Bloc<TaskEvent, ToDoTaskState> {
+  TaskBloc() : super(ActiveTaskState()) {
+    on<TaskEvent>((event, emit) {
       switch(event) {
-        case ToDoTaskEvent.todo: break;
-        case ToDoTaskEvent.completed: break;
+        case TaskEvent.active: emit(ActiveTaskState()); break;
+        case TaskEvent.completed: emit(CompetedTaskState()); break;
       }
-      emit(state.newState(event));
+      //emit(state.newState(event));
     });
   }
 }
