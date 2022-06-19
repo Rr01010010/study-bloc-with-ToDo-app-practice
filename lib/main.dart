@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo/task_data.dart';
 
-import 'bloc/to_do_task_bloc.dart';
+import 'bloc/task_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -59,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: BlocBuilder<TaskBloc, ToDoTaskState>(
+      body: BlocBuilder<TaskBloc, TaskState>(
         builder: (context, state) {
           return Center(
             child: Column(
@@ -80,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget todoWidget(ToDoTaskState task) {
+  Widget todoWidget(TaskState task) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: Row(
