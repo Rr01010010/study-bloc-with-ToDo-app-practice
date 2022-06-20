@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo/task_data.dart';
+import 'package:todo/task/task_data.dart';
 
 part 'task_event.dart';
 part 'task_state.dart';

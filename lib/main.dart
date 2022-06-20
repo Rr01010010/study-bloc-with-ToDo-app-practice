@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'bloc/task_bloc.dart';
+import 'package:todo/task/task_data.dart';
+import 'package:todo/task_page.dart';
+import 'package:todo/tasks_bloc/tasks_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,73 +16,53 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'To Do:',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
       ),
-      home: BlocProvider(
-          create: (_) => TaskBloc(),
-          child: const MyHomePage(title: 'Flutter Demo Home Page')),
+      home: BlocProvider(create: (_) => TasksBloc(), child: const MyHomePage()),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _incrementCounter() {
-    setState(() {
-      //BlocProvider.of<TaskBloc>().
-      //_counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text('To Do:'),
       ),
-      body: BlocBuilder<TaskBloc, TaskState>(
+      body: BlocBuilder<TasksBloc, TasksState>(
         builder: (context, state) {
           return Center(
-            child: Column(
-              children: <Widget>[
-                todoWidget(state),
-                //todoWidget(),
-                //todoWidget(),
-              ],
-            ),
+            child: Column(children: [
+              for (int i = 0; i < state.tasks.length; i++)
+                todoWidget(state.tasks[i], i)
+            ]),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+              value: BlocProvider.of<TasksBloc>(context), child: TaskPage()),
+        )),
+        tooltip: 'Add new',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  Widget todoWidget(TaskState task) {
+  Widget todoWidget(TaskData task, int i) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -89,25 +70,34 @@ class _MyHomePageState extends State<MyHomePage> {
             Align(
                 alignment: Alignment.centerLeft,
                 child: Checkbox(
-                    value: task is CompetedTaskState,
+                    value: task.completed,
                     onChanged: (val) {
-                      BlocProvider.of<TaskBloc>(context).add(
-                          task is CompetedTaskState
-                              ? TaskEvent.active
-                              : TaskEvent.completed);
+                      BlocProvider.of<TasksBloc>(context).add(EditTaskEvent(
+                          newTask: task.turnStatus(completed: !task.completed),
+                          taskIndex: i));
                     })),
             const SizedBox(width: 8),
             Align(
               alignment: Alignment.center,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(task.getData.title,
-                        style: const TextStyle(fontSize: 20)),
-                    Text(task.getData.description,
-                        style: const TextStyle(fontSize: 12)),
-                  ]),
+              child: SizedBox(
+                width: 220,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(task.title, style: const TextStyle(fontSize: 20)),
+                      Text(task.description,
+                          style: const TextStyle(fontSize: 12)),
+                    ]),
+              ),
             ),
+            const Spacer(),
+            IconButton(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => BlocProvider.value(
+                          value: BlocProvider.of<TasksBloc>(context),
+                          child: TaskPage(task: task, taskIndex: i)),
+                    )),
+                icon: const Icon(Icons.edit))
           ]),
     );
   }
