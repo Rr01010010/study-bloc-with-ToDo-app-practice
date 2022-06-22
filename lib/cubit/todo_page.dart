@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo/task/task_data.dart';
-import 'package:todo/tasks_bloc/tasks_bloc.dart';
+import 'package:todo/cubit/todo_cubit/todo_cubit.dart';
+import 'package:todo/cubit/todo_data.dart';
 
-class TaskPage extends StatelessWidget {
-  TaskPage({super.key, this.taskIndex, this.task}) {
-    titleController.text = task?.title ?? "";
-    descriptionController.text = task?.description ?? "";
+class TodoPage extends StatelessWidget {
+  TodoPage({super.key, this.todoIndex, this.todo}) {
+    titleController.text = todo?.title ?? "";
+    descriptionController.text = todo?.description ?? "";
   }
 
-  final int? taskIndex;
-  final TaskData? task;
+  final int? todoIndex;
+  final TodoData? todo;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
@@ -23,8 +23,7 @@ class TaskPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(8),
-        child:
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ...form("Title : ", titleController),
           ...form("Description : ", descriptionController),
           const Spacer(),
@@ -34,23 +33,20 @@ class TaskPage extends StatelessWidget {
               width: double.infinity,
               child: TextButton(
                 onPressed: () {
-                  BlocProvider.of<TasksBloc>(context).add(
-                    taskIndex == null
-                        ? NewTaskEvent(
-                            newTask: TaskData(
-                              title: titleController.text,
-                              description: descriptionController.text,
-                            ),
-                          )
-                        : EditTaskEvent(
-                            taskIndex: taskIndex!,
-                            newTask: TaskData(
-                              title: titleController.text,
-                              description: descriptionController.text,
-                              completed: task?.completed ?? false,
-                            ),
+                  todoIndex == null
+                      ? BlocProvider.of<TodoCubit>(context).newTodo(
+                          todo: TodoData(
+                          title: titleController.text,
+                          description: descriptionController.text,
+                        ))
+                      : BlocProvider.of<TodoCubit>(context).editTodo(
+                          index: todoIndex!,
+                          todo: TodoData(
+                            title: titleController.text,
+                            description: descriptionController.text,
+                            completed: todo?.completed ?? false,
                           ),
-                  );
+                        );
                   Navigator.of(context).pop();
                 },
                 style: ButtonStyle(
@@ -65,12 +61,14 @@ class TaskPage extends StatelessWidget {
           ),
         ]),
       ),
-      floatingActionButton: taskIndex == null
+      floatingActionButton: todoIndex == null
           ? null
           : FloatingActionButton(
               onPressed: () {
-                BlocProvider.of<TasksBloc>(context)
-                    .add(DeleteTaskEvent(taskIndex: taskIndex!));
+                if(todoIndex==null) return;
+
+                BlocProvider.of<TodoCubit>(context).deleteTodo(index: todoIndex!);
+
                 Navigator.of(context).pop();
               },
               tooltip: 'Delete',

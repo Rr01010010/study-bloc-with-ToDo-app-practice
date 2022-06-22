@@ -7,13 +7,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:todo/bloc/my_bloc_app.dart';
 
-import 'package:todo/main.dart';
+import 'package:todo/cubit/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const MyCubitApp());
+    //await tester.pumpWidget(const MyBlocApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

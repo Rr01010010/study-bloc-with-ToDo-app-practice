@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo/task/task_data.dart';
+import 'package:todo/bloc/task/task_data.dart';
 
 part 'tasks_event.dart';
 part 'tasks_state.dart';
